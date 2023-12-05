@@ -46,7 +46,6 @@ Add dependency;
 To start the foundever-technical-backend-test, use the following command:
 > java -jar foundever-technical-backend-test.jar
 
-
 ## API Documentation
 
 For detailed information on available APIs and endpoints, refer to the API documentation at docs/api.md.
