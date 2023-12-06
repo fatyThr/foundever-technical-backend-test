@@ -8,63 +8,86 @@ import com.founderever.technical.backend.domain.entities.Message;
 import com.founderever.technical.backend.domain.repositories.ClientRepository;
 import com.founderever.technical.backend.domain.repositories.MessageRepository;
 import com.founderever.technical.backend.domain.service.ClientService;
-import com.founderever.technical.backend.domain.service.mapper.mapper.ClientMapper;
+import com.founderever.technical.backend.domain.service.mapper.ClientMapper;
+import com.founderever.technical.backend.infrastructure.exceptions.TechnicalException;
+import com.founderever.technical.backend.infrastructure.utils.Pagination;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+@Transactional
 @Slf4j
 @Service
 @AllArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
     private final ClientRepository clientRepository;
-    private final MessageRepository messageRepository;
     private final ClientMapper clientMapper;
-
+    private final MessageRepository messageRepository;
 
     @Override
     public ClientResponse createClient(ClientRequest clientRequest) {
-        List<Message> messages = new ArrayList<>();
-        if(!clientRequest.getMessagesIds().isEmpty()){
-            clientRequest.getMessagesIds().forEach(messageId -> {
-                Optional<Message> messageOptional = messageRepository.findById(UUID.fromString(messageId));
-                messageOptional.ifPresent(messages::add);
-            });
-        }
-        Client client=Client.builder()
+        log.info("Create Client clientRequest: {}", clientRequest);
+        List<Message> messages = getMessagesByIds(clientRequest.getMessagesIds());
+        Client client = Client.builder()
                 .clientName(clientRequest.getClientName())
                 .messages(messages)
                 .build();
-        return clientMapper.clientToClientResponse(clientRepository.save(client));
+        Client savedClient = clientRepository.save(client);
+        messages.forEach(message -> message.setClient(savedClient));
+        return clientMapper.clientToClientResponse(savedClient);
     }
 
     @Override
     public ClientResponse addMessageToClient(String clientId, MessageRequest messageRequest) {
-        Client client = clientRepository.findById(UUID.fromString(clientId)).orElseThrow();
-        Message message=Message.builder()
-                .author(messageRequest.getAuthor())
+        log.info("Add message to Client clientId: {} / messageRequest: {}", clientId, messageRequest);
+        Client client = getClientById(UUID.fromString(clientId));
+        Message message = Message.builder()
                 .content(messageRequest.getContent())
+                .author(messageRequest.getAuthor())
+                .client(client)
                 .build();
+        messageRepository.save(message);
         client.getMessages().add(message);
-        return clientMapper.clientToClientResponse(clientRepository.save(client));
+        return clientMapper.clientToClientResponse(client);
     }
 
     @Override
-    public List<ClientResponse> getAllClients() {
-        return clientRepository.findAll().stream().map(clientMapper::clientToClientResponse).collect(Collectors.toList());
+    public Pagination<ClientResponse> getAllClients(Pageable pageable) {
+        log.info("Get All Clients with page: {} size: {}", pageable.getPageNumber(), pageable.getPageSize());
+        Pagination<Client> pagesClient = clientRepository.findAllClients(pageable);
+        List<ClientResponse> clientResponses = pagesClient.getContent().stream()
+                .map(clientMapper::clientToClientResponse)
+                .toList();
+        return new Pagination<>(clientResponses, pagesClient.getPage(), pagesClient.getSize(), pagesClient.getTotalElements(), pagesClient.getTotalPages());
     }
 
     @Override
-    public ClientResponse updateClient(String clientId, ClientRequest clientRequest) {
-        Client client = clientRepository.findById(UUID.fromString(clientId)).orElseThrow();
+    public void updateClient(String clientId, ClientRequest clientRequest) {
+        log.info("Update Client with id: {} / and data: {}", clientId, clientRequest);
+        Client client = getClientById(UUID.fromString(clientId));
         client.setClientReference(clientRequest.getClientReference());
-        return clientMapper.clientToClientResponse(clientRepository.save(client));
+        clientRepository.save(client);
+    }
+
+     private List<Message> getMessagesByIds(List<String> messageIds) {
+        List<Message> messages = new ArrayList<>();
+        messageIds.forEach(messageId -> {
+            Optional<Message> messageOptional = messageRepository.findById(UUID.fromString(messageId));
+            messageOptional.ifPresent(messages::add);
+        });
+        return messages;
+    }
+
+    private Client getClientById(UUID clientId) {
+        return clientRepository.findById(clientId)
+                .orElseThrow(() -> new TechnicalException("Client not found with ID: " + clientId));
     }
 }

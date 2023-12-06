@@ -14,7 +14,6 @@ public class ClientResponse {
     private String id;
     private String clientName;
     private String clientReference;
-
     private List<MessageResponse> messages;
 
 }

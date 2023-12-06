@@ -45,12 +45,12 @@ Add dependency;
 
 To start the foundever-technical-backend-test, use the following command:
 > java -jar foundever-technical-backend-test.jar
-
+>
 ## API Documentation
 
 For detailed information on available APIs and endpoints, refer to the API documentation at docs/api.md.
 
-Swagger UI Documentation: http://localhost:8080/api-docs
+Swagger UI Documentation: http://localhost:8080/swagger-ui/index.html
 
  
 
