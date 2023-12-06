@@ -3,6 +3,8 @@ package com.founderever.technical.backend.application.controller;
 import com.founderever.technical.backend.application.request.MessageRequest;
 import com.founderever.technical.backend.application.response.MessageResponse;
 import com.founderever.technical.backend.domain.service.MessageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(
+        name = "CRUD REST APIs for Message Resource",
+        description = "CRUD REST APIs "
+)
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -19,9 +25,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class MessageController {
     private final MessageService messageService;
 
+    @Operation(
+            summary = "Create Message REST API",
+            description = "Create Message REST API is used to save Message"
+    )
     @PostMapping("/messages")
     public ResponseEntity<MessageResponse> createMessage(@RequestBody MessageRequest messageRequest) {
-        log.info(" Controller Start create message messageRequest:{}",messageRequest);
+        log.info(" Controller Start create message messageRequest:{}", messageRequest);
         MessageResponse createdMessage = messageService.createMessage(messageRequest);
         return new ResponseEntity<>(createdMessage, HttpStatus.CREATED);
     }

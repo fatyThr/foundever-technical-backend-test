@@ -21,8 +21,7 @@ public class Client {
     private UUID id;
     private String clientName;
     private String clientReference;
-
-    @OneToMany
+    @OneToMany(mappedBy = "client")
     private List<Message> messages;
 
 }
