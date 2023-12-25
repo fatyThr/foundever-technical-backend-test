@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 @Tag(
         name = "CRUD REST APIs for Client Resource",
         description = "CRUD REST APIs - Create Client, Update Client,  Get All Client"

@@ -1,20 +1,21 @@
 package com.founderever.technical.backend.domain.service;
+
 import com.founderever.technical.backend.application.request.MessageRequest;
 import com.founderever.technical.backend.application.response.MessageResponse;
 import com.founderever.technical.backend.domain.entities.Message;
 import com.founderever.technical.backend.domain.repositories.MessageRepository;
 import com.founderever.technical.backend.domain.service.impl.MessageServiceImpl;
 import com.founderever.technical.backend.domain.service.mapper.MessageMapper;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MessageServiceImplTest {
 
@@ -27,12 +28,11 @@ public class MessageServiceImplTest {
     private MessageServiceImpl messageService;
     private MessageRequest messageRequest;
 
-    @BeforeEach
+    @BeforeAll
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         buildMessageRequest();
     }
-
 
 
     @Test

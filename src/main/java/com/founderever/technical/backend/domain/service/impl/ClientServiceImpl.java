@@ -13,6 +13,7 @@ import com.founderever.technical.backend.infrastructure.exceptions.TechnicalExce
 import com.founderever.technical.backend.infrastructure.utils.Pagination;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,11 +63,11 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public Pagination<ClientResponse> getAllClients(Pageable pageable) {
         log.info("Get All Clients with page: {} size: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Pagination<Client> pagesClient = clientRepository.findAllClients(pageable);
+        Page<Client> pagesClient = clientRepository.findAll(pageable);
         List<ClientResponse> clientResponses = pagesClient.getContent().stream()
                 .map(clientMapper::clientToClientResponse)
                 .toList();
-        return new Pagination<>(clientResponses, pagesClient.getPage(), pagesClient.getSize(), pagesClient.getTotalElements(), pagesClient.getTotalPages());
+        return new Pagination<>(clientResponses, pageable.getPageNumber(), pagesClient.getSize(), pagesClient.getTotalElements(), pagesClient.getTotalPages());
     }
 
     @Override
@@ -88,6 +89,8 @@ public class ClientServiceImpl implements ClientService {
 
     private Client getClientById(UUID clientId) {
         return clientRepository.findById(clientId)
-                .orElseThrow(() -> new TechnicalException("Client not found with ID: " + clientId));
+                .orElseThrow(() -> new TechnicalException("error.client.not.found",
+
+                        clientId));
     }
 }

@@ -4,9 +4,7 @@ import com.founderever.technical.backend.application.request.MessageRequest;
 import com.founderever.technical.backend.application.response.MessageResponse;
 import com.founderever.technical.backend.domain.entities.Message;
 import com.founderever.technical.backend.domain.repositories.MessageRepository;
-import com.founderever.technical.backend.domain.service.ClientService;
 import com.founderever.technical.backend.domain.service.MessageService;
-import com.founderever.technical.backend.domain.service.mapper.ClientMapper;
 import com.founderever.technical.backend.domain.service.mapper.MessageMapper;
 import com.founderever.technical.backend.infrastructure.exceptions.TechnicalException;
 import lombok.AllArgsConstructor;
@@ -42,7 +40,7 @@ public class MessageServiceImpl implements MessageService {
         log.info("Get message with id: {} ", messageId);
         Optional<Message> message = messageRepository.findById(UUID.fromString(messageId));
         if (message.isEmpty()) {
-            throw new TechnicalException("Message Not found with id "+messageId);
+            throw new TechnicalException("error.message.not.found", messageId);
         }
         return messageMapper.messageToMessageResponse(message.get());
 
