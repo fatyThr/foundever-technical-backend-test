@@ -2,6 +2,7 @@ package com.founderever.technical.backend.domain.service;
 
 import com.founderever.technical.backend.application.request.ClientRequest;
 import com.founderever.technical.backend.application.response.ClientResponse;
+import com.founderever.technical.backend.application.response.MessageResponse;
 import com.founderever.technical.backend.domain.entities.Client;
 import com.founderever.technical.backend.domain.entities.Message;
 import com.founderever.technical.backend.domain.repositories.ClientRepository;
@@ -14,74 +15,74 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 public class ClientServiceImplTest {
-
     @Mock
     private ClientRepository clientRepository;
-
-    @Mock
-    private MessageRepository messageRepository;
-
     @Mock
     private ClientMapper clientMapper;
-
+    @Mock
+    private MessageRepository messageRepository;
     @InjectMocks
     private ClientServiceImpl clientService;
+
     private ClientRequest clientRequest;
-    private Message message;
+    private ClientResponse clientResponse;
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         buildClientRequest();
-        buildMessage();
+        buildClientResponse();
     }
+
 
     @Test
-    public void testCreateClient() {
-
-        when(messageRepository.findById(any(UUID.class))).thenReturn(Optional.of(message));
-        Client mockedClient = Client.builder()
+    void givenClientRequest_createNewClient_ReturnOk() {
+        String messageId="37991141-c116-484a-aeec-31bc91ca6275";
+        Client client=Client.builder()
                 .clientName(clientRequest.getClientName())
-                .messages(List.of(message))
-                .build();
+                .messages(Collections.singletonList(Message.builder().id(UUID.fromString(messageId)).build())).build();
+        when(messageRepository.findById(any())).thenReturn(Optional.of(new Message()));
+        when(clientRepository.save(any(Client.class))).thenReturn(client);
+        when(clientMapper.clientToClientResponse(any(Client.class))).thenReturn(clientResponse);
+        ClientResponse result = clientService.createNewClient(clientRequest);
 
-        when(clientRepository.save(any(Client.class))).thenReturn(mockedClient);
+        assertNotNull(result);
+        assertEquals(clientResponse.getClientName(), result.getClientName());
+        assertEquals(clientResponse.getMessages().size(), result.getMessages().size());
 
-        ClientResponse mockedClientResponse=ClientResponse.builder().build();
-        when(clientMapper.clientToClientResponse(any(Client.class))).thenReturn(mockedClientResponse);
-        ClientResponse response = clientService.createClient(clientRequest);
-        verify(clientRepository).save(any(Client.class));
-        verify(clientMapper).clientToClientResponse(any(Client.class));
+        verify(messageRepository, times(1)).findById(UUID.fromString(messageId));
+        verify(clientRepository, times(1)).save(any(Client.class));
+        verify(clientMapper, times(1)).clientToClientResponse(any(Client.class));
 
-        assertEquals(mockedClientResponse, response);
+
+
     }
-
-    private void buildMessage() {
-        this.message = Message.builder()
-                .author("Author")
-                .content("Content")
-                .build();
-     }
 
     private void buildClientRequest() {
         List<String> messageIds = new ArrayList<>();
-        messageIds.add(UUID.randomUUID().toString());
-        this.clientRequest=ClientRequest.builder()
+        messageIds.add("37991141-c116-484a-aeec-31bc91ca6275");
+        this.clientRequest = ClientRequest.builder()
                 .clientName("John Doe")
                 .messagesIds(messageIds)
                 .build();
 
-     }
+    }
+    private void buildClientResponse() {
+        List<MessageResponse> messages = new ArrayList<>();
+        MessageResponse messageResponse=MessageResponse.builder()
+                .id("37991141-c116-484a-aeec-31bc91ca6275").author("John Doe").content("Hello Dear!").build();
+        messages.add(messageResponse);
+        this.clientResponse = ClientResponse.builder()
+                .clientName("John Doe")
+                .messages(messages)
+                .build();
 
-    // Similar tests for other methods (addMessageToClient, getAllClients, updateClient) can be added here.
+    }
 }

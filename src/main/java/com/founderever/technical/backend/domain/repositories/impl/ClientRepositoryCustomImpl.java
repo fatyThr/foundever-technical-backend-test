@@ -1,5 +1,6 @@
 package com.founderever.technical.backend.domain.repositories.impl;
 
+import com.founderever.technical.backend.application.request.ClientRequest;
 import com.founderever.technical.backend.domain.entities.Client;
 import com.founderever.technical.backend.domain.repositories.ClientRepositoryCustom;
 import com.founderever.technical.backend.infrastructure.utils.Pagination;
@@ -20,22 +21,28 @@ public class ClientRepositoryCustomImpl implements ClientRepositoryCustom {
 
 
     @Override
-    public Pagination<Client> findAllClients(Pageable pageable) {
-        StringBuilder queryBuilder = new StringBuilder(" select client from Client client ");
-        StringBuilder countBuilder = new StringBuilder(" select count(client) from Client client ");
+    public Pagination<Client> findByCriteres(ClientRequest clientRequest, Pageable pageable) {
+        Map<String,Object> params=new HashMap<>();
+        StringBuilder queryBuilder=new StringBuilder(" Select client from Client client ");
+        StringBuilder countBuilder=new StringBuilder(" Select count(client) from Client client ");
+        StringBuilder whereBuilder=new StringBuilder(" where 1=1  ");
 
-        jakarta.persistence.Query countQuery = entityManager.createQuery(countBuilder.toString());
-        long count = (long) countQuery.getSingleResult();
+        if(clientRequest.getClientName()!=null){
+            whereBuilder.append(" and client.clientName=:clientName");
+            params.put("clientName",clientRequest.getClientName());
 
-        Query query = entityManager.createQuery(queryBuilder.toString());
-
-        int pageSize = pageable.getPageSize();
-        int pageNumber = pageable.getPageNumber();
-        query.setFirstResult((pageNumber - 1) * pageSize);
-        query.setMaxResults(pageSize);
-        int totalPages = (int) Math.ceil((double) count / pageSize);
-
-        return new Pagination<>(query.getResultList(), pageNumber - 1, pageSize, count, totalPages);
+        }
+        countBuilder.append(whereBuilder);
+        Query countQuery=entityManager.createQuery(countBuilder.toString());
+        params.forEach(countQuery::setParameter);
+        long count= (long) countQuery.getSingleResult();
+        queryBuilder.append(whereBuilder);
+        Query query=entityManager.createQuery(queryBuilder.toString());
+        params.forEach(query::setParameter);
+        query.setFirstResult(((int) pageable.getPageNumber())* pageable.getPageSize());
+        query.setMaxResults(pageable.getPageSize());
+        long totalPages= (long) Math.ceil((double) count /pageable.getPageSize());
+        return new Pagination<>(query.getResultList(), pageable.getPageNumber(), pageable.getPageSize(), count, totalPages);
 
     }
 }

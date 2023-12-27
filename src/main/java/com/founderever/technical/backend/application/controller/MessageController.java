@@ -29,11 +29,10 @@ public class MessageController {
             summary = "Create Message REST API",
             description = "Create Message REST API is used to save Message"
     )
-    @PostMapping("/messages")
-    public ResponseEntity<MessageResponse> createMessage(@RequestBody MessageRequest messageRequest) {
-        log.info(" Controller Start create message messageRequest:{}", messageRequest);
-        MessageResponse createdMessage = messageService.createMessage(messageRequest);
-        return new ResponseEntity<>(createdMessage, HttpStatus.CREATED);
+    @PostMapping
+    public ResponseEntity<MessageResponse> createNewMessage(@RequestBody MessageRequest messageRequest){
+        log.info("Controller Create new massage MessageRequest :"+messageRequest);
+        return new ResponseEntity<>(messageService.createNewMessage(messageRequest), HttpStatus.CREATED);
     }
 
 }

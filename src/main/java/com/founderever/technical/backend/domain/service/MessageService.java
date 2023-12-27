@@ -4,7 +4,5 @@ import com.founderever.technical.backend.application.request.MessageRequest;
 import com.founderever.technical.backend.application.response.MessageResponse;
 
 public interface MessageService {
-    MessageResponse createMessage(MessageRequest messageRequest);
-    MessageResponse getMessageById(String messageId);
-
+    MessageResponse createNewMessage(MessageRequest messageRequest);
 }
