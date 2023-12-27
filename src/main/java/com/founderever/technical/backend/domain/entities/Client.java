@@ -21,7 +21,7 @@ public class Client {
     private UUID id;
     private String clientName;
     private String clientReference;
-    @OneToMany(mappedBy = "client")
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Message> messages;
 
 }

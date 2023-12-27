@@ -7,9 +7,9 @@ import com.founderever.technical.backend.infrastructure.utils.Pagination;
 import org.springframework.data.domain.Pageable;
 
 public interface ClientService {
-    ClientResponse createClient(ClientRequest clientRequest);
-    ClientResponse addMessageToClient(String clientId, MessageRequest messageRequest);
-    void updateClient(String clientId, ClientRequest clientRequest);
-    Pagination<ClientResponse> getAllClients(Pageable pageable);
 
+    ClientResponse createNewClient(ClientRequest clientRequest);
+    ClientResponse addNewMessageToClient(String clientId, MessageRequest messageRequest);
+    Pagination<ClientResponse> getAllClients(int page, int size);
+    void updateClient(String clientId, ClientRequest clientRequest);
 }
