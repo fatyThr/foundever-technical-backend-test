@@ -1,5 +1,6 @@
 package com.founderever.technical.backend.domain.entities;
 
+import com.founderever.technical.backend.infrastructure.utils.enums.ChannelEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,4 +22,6 @@ public class Message implements Serializable {
     private UUID id;
     private String content;
     private String author;
+    @Enumerated(EnumType.STRING)
+    private ChannelEnum channel;
 }

@@ -6,14 +6,11 @@ import com.founderever.technical.backend.domain.entities.Message;
 import com.founderever.technical.backend.domain.repositories.MessageRepository;
 import com.founderever.technical.backend.domain.service.MessageService;
 import com.founderever.technical.backend.domain.service.mapper.MessageMapper;
-import com.founderever.technical.backend.infrastructure.exceptions.TechnicalException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import static com.founderever.technical.backend.infrastructure.utils.enums.ChannelEnum.fromValue;
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -25,6 +22,7 @@ public class MessageServiceImpl implements MessageService {private final Message
         Message message=Message.builder()
                 .author(messageRequest.getAuthor())
                 .content(messageRequest.getContent())
+                .channel(fromValue(messageRequest.getChannel()))
                 .build();
         Message createdMessage=messageRepository.save(message);
         return messageMapper.messageToMessageResponse(createdMessage);

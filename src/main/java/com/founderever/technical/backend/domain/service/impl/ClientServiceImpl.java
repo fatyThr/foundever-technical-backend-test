@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+import static com.founderever.technical.backend.infrastructure.utils.enums.ChannelEnum.fromValue;
+
 @Slf4j
 @AllArgsConstructor
 @Service
@@ -46,7 +48,9 @@ public class ClientServiceImpl implements ClientService {
         Client client = getClientById(clientId);
         Message message = Message.builder()
                 .author(messageRequest.getAuthor())
-                .content(messageRequest.getContent()).build();
+                .content(messageRequest.getContent())
+                .channel(fromValue(messageRequest.getChannel()))
+                .build();
         client.getMessages().add(message);
 
         return clientMapper.clientToClientResponse(clientRepository.save(client));
