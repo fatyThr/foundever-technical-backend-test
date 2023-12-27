@@ -9,5 +9,6 @@ public class MessageRequest {
 
     private String author;
     private String content;
+    private String channel;
 
 }
