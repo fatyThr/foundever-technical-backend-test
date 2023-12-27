@@ -17,33 +17,17 @@ import java.util.UUID;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageServiceImpl implements MessageService {
-
-    private final MessageRepository messageRepository;
+public class MessageServiceImpl implements MessageService {private final MessageRepository messageRepository;
     private final MessageMapper messageMapper;
-
-
-
     @Override
-    public MessageResponse createMessage(MessageRequest messageRequest) {
-        log.info("Service Start Create message with messageRequest: {} ", messageRequest);
-        Message message = Message.builder()
+    public MessageResponse createNewMessage(MessageRequest messageRequest) {
+        log.info("Service Create new massage MessageRequest :"+messageRequest);
+        Message message=Message.builder()
                 .author(messageRequest.getAuthor())
                 .content(messageRequest.getContent())
                 .build();
-        return messageMapper.messageToMessageResponse(messageRepository.save(message));
-    }
-
-
-    @Override
-    public MessageResponse getMessageById(String messageId) {
-        log.info("Get message with id: {} ", messageId);
-        Optional<Message> message = messageRepository.findById(UUID.fromString(messageId));
-        if (message.isEmpty()) {
-            throw new TechnicalException("error.message.not.found", messageId);
-        }
-        return messageMapper.messageToMessageResponse(message.get());
-
+        Message createdMessage=messageRepository.save(message);
+        return messageMapper.messageToMessageResponse(createdMessage);
     }
 
 }

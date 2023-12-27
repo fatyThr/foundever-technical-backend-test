@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 
@@ -14,13 +15,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Message {
-
-    @Id
+public class Message implements Serializable {
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Id
     private UUID id;
-    private String author;
     private String content;
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;}
+    private String author;
+}
