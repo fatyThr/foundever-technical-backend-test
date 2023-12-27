@@ -9,7 +9,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 @Tag(
@@ -50,5 +53,16 @@ public class ClientController {
     public Pagination<ClientResponse> getAllClients(@RequestParam int page,@RequestParam int size) {
         log.info("Controller all clients page {} size : {}",page,size);
         return clientService.getAllClients(page,size);
+    }
+
+    @Operation(summary ="Search Client",description = "REST APi to search Client by criteria")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Pagination<ClientResponse> searchByCriteres(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestBody ClientRequest clientRequest) {
+        Pageable pageable= PageRequest.of(page,size);
+        log.info("Controller search clients {} page {} size : {}",clientRequest,page,size);
+        return clientService.searchByCriteres(clientRequest,pageable);
     }
 }

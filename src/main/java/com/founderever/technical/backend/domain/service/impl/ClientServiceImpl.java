@@ -64,6 +64,13 @@ public class ClientServiceImpl implements ClientService {
         List<ClientResponse> clientResponses = page.getContent().stream().map(clientMapper::clientToClientResponse).toList();
         return new Pagination<>(clientResponses, page.getNumber(), page.getSize(), page.getTotalPages(), page.getTotalElements());
     }
+    @Override
+    public Pagination<ClientResponse> searchByCriteres(ClientRequest clientRequest, Pageable pageable) {
+        log.info("Service to get all Clients payload {} page {} size {}", clientRequest, pageable.getPageNumber(),pageable.getPageSize());
+        Pagination<Client> pages=clientRepository.findByCriteres(clientRequest,pageable);
+        List<ClientResponse> clientResponses =pages.getContent().stream().map(clientMapper::clientToClientResponse).toList() ;
+        return new Pagination<>(clientResponses,pages.getPage(),pages.getSize(),pages.getTotalPages(),pages.getTotalElements());
+    }
 
     @Override
     public void updateClient(String clientId, ClientRequest clientRequest) {

@@ -11,5 +11,8 @@ public interface ClientService {
     ClientResponse createNewClient(ClientRequest clientRequest);
     ClientResponse addNewMessageToClient(String clientId, MessageRequest messageRequest);
     Pagination<ClientResponse> getAllClients(int page, int size);
+
+    Pagination<ClientResponse> searchByCriteres(ClientRequest clientRequest, Pageable pageable);
+
     void updateClient(String clientId, ClientRequest clientRequest);
 }

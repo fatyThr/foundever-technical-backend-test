@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class ClientRepositoryCustomImpl implements ClientRepositoryCustom {
+public class ClientRepositoryImpl implements ClientRepositoryCustom {
 
     @Autowired
     private EntityManager entityManager;
@@ -32,6 +32,11 @@ public class ClientRepositoryCustomImpl implements ClientRepositoryCustom {
             params.put("clientName",clientRequest.getClientName());
 
         }
+        if(clientRequest.getClientReference()!=null){
+            whereBuilder.append(" and client.clientReference=:clientReference");
+            params.put("clientReference",clientRequest.getClientReference());
+
+        }
         countBuilder.append(whereBuilder);
         Query countQuery=entityManager.createQuery(countBuilder.toString());
         params.forEach(countQuery::setParameter);
@@ -39,10 +44,11 @@ public class ClientRepositoryCustomImpl implements ClientRepositoryCustom {
         queryBuilder.append(whereBuilder);
         Query query=entityManager.createQuery(queryBuilder.toString());
         params.forEach(query::setParameter);
-        query.setFirstResult(((int) pageable.getPageNumber())* pageable.getPageSize());
+        int numberPage=pageable.getPageNumber();
+        query.setFirstResult(numberPage* pageable.getPageSize());
         query.setMaxResults(pageable.getPageSize());
         long totalPages= (long) Math.ceil((double) count /pageable.getPageSize());
-        return new Pagination<>(query.getResultList(), pageable.getPageNumber(), pageable.getPageSize(), count, totalPages);
+        return new Pagination<Client>(query.getResultList(), numberPage, pageable.getPageSize(), count, totalPages);
 
     }
 }
